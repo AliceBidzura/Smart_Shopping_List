@@ -45,7 +45,13 @@
                 <ItemsControl ItemsSource="{Binding CurrentProducts}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked}"/>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,5">
+                                <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked}" VerticalAlignment="Center"/>
+                                <Button Content="🗑"
+                                        Command="{Binding DataContext.DeleteProductCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter ="{Binding}" 
+                                        Background="Transparent" BorderThickness="0" FontSize="12" ToolTip="Delete"/>
+                            </StackPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

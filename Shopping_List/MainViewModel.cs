@@ -15,7 +15,7 @@ namespace Shopping_List
         public ObservableCollection<Product> CurrentProducts { get; set; }
 
         private string _newProductName;
-        public string NewProductName 
+        public string NewProductName
         {
             get => _newProductName;
             set
@@ -29,12 +29,14 @@ namespace Shopping_List
         }
 
         public ICommand AddProductCommand { get; }
+        public ICommand DeleteProductCommand { get; }
 
         public MainViewModel()
         {
             CurrentProducts = new ObservableCollection<Product>();
             //{new Product { Name = "Тестовый продукт", IsChecked = false }};
             AddProductCommand = new RelayCommand(AddProduct, CanAddProduct);
+            DeleteProductCommand = new RelayCommand<Product>(DeleteProduct);
         }
 
         private void AddProduct()
@@ -47,6 +49,13 @@ namespace Shopping_List
             });
             NewProductName = ""; // очистить поле ввода
         }
+
+        private void DeleteProduct(Product product)
+        {
+            if (product != null && CurrentProducts.Contains(product))
+                CurrentProducts.Remove(product);
+        }
+
 
         private bool CanAddProduct()
         {
