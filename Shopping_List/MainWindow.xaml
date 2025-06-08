@@ -32,10 +32,12 @@
             <!-- Архив -->
             <StackPanel Grid.Column="0" Margin="0,0,10,0">
                 <TextBlock Text="Архив списков" FontWeight="Bold" Margin="0,0,0,5"/>
-                <ListBox Height="300">
-                    <ListBoxItem>20.04.2025</ListBoxItem>
-                    <ListBoxItem>13.04.2025</ListBoxItem>
-                    <ListBoxItem>06.04.2025</ListBoxItem>
+                <ListBox ItemsSource="{Binding Archives}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Summary}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
                 </ListBox>
             </StackPanel>
 
@@ -54,8 +56,9 @@
                             </StackPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                <Button Content="Завершить список" Width="200"/>
+                </ItemsControl> 
+                <Button Content="Завершить список" Width="200"
+                        Command="{Binding CompleteListCommand}"/>
             </StackPanel>
         </Grid>
 

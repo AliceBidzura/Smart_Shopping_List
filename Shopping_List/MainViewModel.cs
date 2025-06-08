@@ -13,6 +13,7 @@ namespace Shopping_List
     public class MainViewModel : INotifyPropertyChanged
     {
         public ObservableCollection<Product> CurrentProducts { get; set; }
+        public ObservableCollection<ShoppingListArchive> Archives { get; set; }
 
         private string _newProductName;
         public string NewProductName
@@ -30,13 +31,22 @@ namespace Shopping_List
 
         public ICommand AddProductCommand { get; }
         public ICommand DeleteProductCommand { get; }
+        public ICommand CompleteListCommand { get; }
 
         public MainViewModel()
         {
             CurrentProducts = new ObservableCollection<Product>();
             //{new Product { Name = "Тестовый продукт", IsChecked = false }};
+
+            Archives = new ObservableCollection<ShoppingListArchive>();
             AddProductCommand = new RelayCommand(AddProduct, CanAddProduct);
             DeleteProductCommand = new RelayCommand<Product>(DeleteProduct);
+            CompleteListCommand = new RelayCommand(CompleteList, CanCompleteList);
+            CurrentProducts.CollectionChanged += (_, __) =>
+            {
+                (CompleteListCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                //как только изменится CurrentProducts — команда CompleteListCommand проверит, можно ли снова быть активной
+            };
         }
 
         private void AddProduct()
@@ -61,6 +71,25 @@ namespace Shopping_List
         {
             return !string.IsNullOrWhiteSpace(NewProductName);
         }
+
+        private void CompleteList()
+        {
+            // Архивируем текущий список
+            Archives.Insert(0, new ShoppingListArchive
+            {
+                Date = DateTime.Now,
+                Products = CurrentProducts.ToList()
+            });
+
+            // Очищаем текущий список
+            CurrentProducts.Clear();
+        }
+
+        private bool CanCompleteList()
+        {
+            return CurrentProducts.Any();
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null) =>
