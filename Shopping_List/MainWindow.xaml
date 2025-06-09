@@ -47,16 +47,33 @@
                 <ItemsControl ItemsSource="{Binding CurrentProducts}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,5">
-                                <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked}" VerticalAlignment="Center"/>
-                                <Button Content="🗑"
-                                        Command="{Binding DataContext.DeleteProductCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter ="{Binding}" 
-                                        Background="Transparent" BorderThickness="0" FontSize="12" ToolTip="Delete"/>
-                            </StackPanel>
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Название продукта с чекбоксом -->
+                                <CheckBox Content="{Binding Name}" 
+                                IsChecked="{Binding IsChecked}" 
+                                VerticalAlignment="Center" />
+
+                                <!-- Кнопка удаления (мусорка) -->
+                                <Button Grid.Column="1"
+                                Content="🗑"
+                                Command="{Binding DataContext.DeleteProductCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding}"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                FontSize="16"
+                                Margin="10,0,0,0"
+                                ToolTip="Удалить"
+                                VerticalAlignment="Center"/>
+                            </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
-                </ItemsControl> 
+                </ItemsControl>
+
                 <Button Content="Завершить список" Width="200"
                         Command="{Binding CompleteListCommand}"/>
             </StackPanel>
