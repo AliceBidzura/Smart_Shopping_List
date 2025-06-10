@@ -22,7 +22,7 @@ namespace Shopping_List
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainViewModel(); // подключаем ViewModel
+            _viewModel = new MainViewModel();   // подключаем ViewModel
             this.DataContext = _viewModel;
         }
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)

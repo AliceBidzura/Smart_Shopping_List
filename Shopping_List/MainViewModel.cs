@@ -7,6 +7,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using System.IO;
+using System.Text.Json;
 
 namespace Shopping_List
 {
@@ -44,18 +46,17 @@ namespace Shopping_List
             AddProductCommand = new RelayCommand(AddProduct, CanAddProduct);
             DeleteProductCommand = new RelayCommand<Product>(DeleteProduct);
             CompleteListCommand = new RelayCommand(CompleteList, CanCompleteList);
-            CurrentProducts.CollectionChanged += (_, __) =>
-            {
-                (CompleteListCommand as RelayCommand)?.RaiseCanExecuteChanged();
-                //как только изменится CurrentProducts — команда CompleteListCommand проверит, можно ли снова быть активной
-
-            };
 
             // работа с файлом
             var data = StorageService.Load();
             CurrentProducts = new ObservableCollection<Product>(data.CurrentProducts);
             Archives = new ObservableCollection<ShoppingListArchive>(data.Archives);
 
+            CurrentProducts.CollectionChanged += (_, __) =>
+            {
+                (CompleteListCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                //как только изменится CurrentProducts — команда CompleteListCommand проверит, можно ли снова быть активной
+            };
         }
         public void Save()
         {
