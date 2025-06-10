@@ -12,6 +12,8 @@ namespace Shopping_List
 {
     public class MainViewModel : INotifyPropertyChanged
     {
+        private const string FilePath = "shopping_data.json";
+
         public ObservableCollection<Product> CurrentProducts { get; set; }
         public ObservableCollection<ShoppingListArchive> Archives { get; set; }
 
@@ -46,7 +48,22 @@ namespace Shopping_List
             {
                 (CompleteListCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 //как только изменится CurrentProducts — команда CompleteListCommand проверит, можно ли снова быть активной
+
             };
+
+            // работа с файлом
+            var data = StorageService.Load();
+            CurrentProducts = new ObservableCollection<Product>(data.CurrentProducts);
+            Archives = new ObservableCollection<ShoppingListArchive>(data.Archives);
+
+        }
+        public void Save()
+        {
+            StorageService.Save(new AppData
+            {
+                CurrentProducts = CurrentProducts.ToList(),
+                Archives = Archives.ToList()
+            });
         }
 
         private void AddProduct()

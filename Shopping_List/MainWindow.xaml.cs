@@ -12,15 +12,23 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace Shopping_List
 {
     public partial class MainWindow : Window
     {
+        private MainViewModel _viewModel;
         public MainWindow()
         {
             InitializeComponent();
             DataContext = new MainViewModel(); // подключаем ViewModel
+            this.DataContext = _viewModel;
+        }
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            _viewModel.Save(); // <-- сохраняем один раз при закрытии
         }
     }
 }
