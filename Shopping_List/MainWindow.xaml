@@ -92,7 +92,7 @@
                                         Command="{Binding DataContext.AddSuggestionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                         CommandParameter="{Binding ProductName}"
                                         Margin="0, 0, 5, 0"/>
-                                <Button Content="Нет"/>
+                                <!--<Button Content="Нет"/>-->
                             </StackPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
