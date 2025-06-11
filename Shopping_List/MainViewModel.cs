@@ -18,6 +18,7 @@ namespace Shopping_List
 
         public ObservableCollection<Product> CurrentProducts { get; set; }
         public ObservableCollection<ShoppingListArchive> Archives { get; set; }
+        public ObservableCollection<Suggestion> Suggestions { get; set; } = new ObservableCollection<Suggestion>();
 
         private string _newProductName;
         public string NewProductName
@@ -36,6 +37,8 @@ namespace Shopping_List
         public ICommand AddProductCommand { get; }
         public ICommand DeleteProductCommand { get; }
         public ICommand CompleteListCommand { get; }
+        public ICommand AddSuggestionCommand { get; }
+
 
         public MainViewModel()
         {
@@ -46,11 +49,13 @@ namespace Shopping_List
             AddProductCommand = new RelayCommand(AddProduct, CanAddProduct);
             DeleteProductCommand = new RelayCommand<Product>(DeleteProduct);
             CompleteListCommand = new RelayCommand(CompleteList, CanCompleteList);
+            AddSuggestionCommand = new RelayCommand<string>(AddSuggestion);
 
             // работа с файлом
             var data = StorageService.Load();
             CurrentProducts = new ObservableCollection<Product>(data.CurrentProducts);
             Archives = new ObservableCollection<ShoppingListArchive>(data.Archives);
+            UpdateSuggestions(); // ← принудительный вызов
 
             CurrentProducts.CollectionChanged += (_, __) =>
             {
@@ -112,5 +117,48 @@ namespace Shopping_List
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        //подсказки
+        private void UpdateSuggestions()
+        {
+            Suggestions.Clear();
+
+            var allArchivedProducts = Archives
+                .SelectMany(a => a.Products)
+                .GroupBy(p => p.Name)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            foreach (var entry in allArchivedProducts)
+            {
+                string productName = entry.Key;
+                int timesBought = entry.Value;
+
+                bool alreadyInCurrent = CurrentProducts.Any(p => p.Name == productName);
+
+                // Показывать подсказки только для популярных продуктов, которых сейчас нет
+                if (timesBought >= 2 && !alreadyInCurrent)
+                {
+                    Suggestions.Add(new Suggestion
+                    {
+                        ProductName = productName,
+                        Message = $"Вы часто покупали {productName}. Добавить?"
+                    });
+                }
+            }
+        }
+        private void AddSuggestion(string productName)
+        {
+            if (!string.IsNullOrWhiteSpace(productName))
+            {
+                CurrentProducts.Add(new Product
+                {
+                    Name = productName,
+                    IsChecked = false,
+                    DateAdded = DateTime.Now
+                });
+
+                UpdateSuggestions(); // обновим подсказки после добавления
+            }
+        }
     }
 }

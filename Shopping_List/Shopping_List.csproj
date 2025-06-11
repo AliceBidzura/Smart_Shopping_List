@@ -91,6 +91,7 @@
     <Compile Include="ShoppingList.cs" />
     <Compile Include="ShoppingListArchive.cs" />
     <Compile Include="StorageService.cs" />
+    <Compile Include="Suggestion.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
