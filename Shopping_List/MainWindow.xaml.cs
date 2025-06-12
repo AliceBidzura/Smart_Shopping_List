@@ -30,5 +30,15 @@ namespace Shopping_List
             base.OnClosing(e);
             _viewModel.Save(); // <-- сохраняем один раз при закрытии
         }
+        private void Suggestion_Click(object sender, MouseButtonEventArgs e)
+        {
+            Console.WriteLine("working");
+            if (sender is ListBoxItem item && item.DataContext is string suggestion)
+            {
+                _viewModel.NewProductName = suggestion;
+                _viewModel.SuggestedProducts.Clear();
+            }
+        }
+
     }
 }

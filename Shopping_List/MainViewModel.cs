@@ -19,6 +19,17 @@ namespace Shopping_List
         public ObservableCollection<Product> CurrentProducts { get; set; }
         public ObservableCollection<ShoppingListArchive> Archives { get; set; }
         public ObservableCollection<Suggestion> Suggestions { get; set; } = new ObservableCollection<Suggestion>();
+        
+        private ObservableCollection<string> _suggestedProducts;
+        public ObservableCollection<string> SuggestedProducts
+        {
+            get => _suggestedProducts;
+            set
+            {
+                _suggestedProducts = value;
+                OnPropertyChanged();
+            }
+        }
 
         private string _newProductName;
         public string NewProductName
@@ -31,6 +42,7 @@ namespace Shopping_List
 
                 // Обновляем доступность команды
                 (AddProductCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                UpdateProductSuggestions(); //чтобы при каждом изменении текста — обновлялись подсказки
             }
         }
 
@@ -39,6 +51,7 @@ namespace Shopping_List
         public ICommand CompleteListCommand { get; }
         public ICommand AddSuggestionCommand { get; }
         public ICommand RepeatListCommand { get; }
+        public ICommand SelectSuggestedProductCommand { get; }
 
 
         public MainViewModel()
@@ -52,6 +65,11 @@ namespace Shopping_List
             CompleteListCommand = new RelayCommand(CompleteList, CanCompleteList);
             AddSuggestionCommand = new RelayCommand<string>(AddSuggestion);
             RepeatListCommand = new RelayCommand<ShoppingListArchive>(RepeatList);
+            SelectSuggestedProductCommand = new RelayCommand<string>(product =>
+            {
+                NewProductName = product;
+                SuggestedProducts.Clear();
+            });
 
             // работа с файлом
             var data = StorageService.Load();
@@ -177,6 +195,27 @@ namespace Shopping_List
             }
 
             UpdateSuggestions();
+        }
+
+        //подсказки при вводе
+        private void UpdateProductSuggestions()
+        {
+            if (NewProductName == null)
+            {
+                SuggestedProducts.Clear();
+                return;
+            }
+            else
+            {
+                var allProducts = Archives.SelectMany(a => a.Products).Select(p => p.Name).Distinct().Where(n => n.StartsWith(NewProductName, StringComparison.OrdinalIgnoreCase)).Take(5);
+                
+                SuggestedProducts = new ObservableCollection<string>(allProducts);
+
+                //ObservableCollection<ShoppingListArchive>, а каждый архив содержит .Products,
+                //где Product.Name — строка. Значит SelectMany(a => a.Products).Select(p => p.Name)
+                //даст тебе список всех продуктов из всех архивов.
+                //Distinct() — чтобы не было дублей
+            }
         }
     }
 }
