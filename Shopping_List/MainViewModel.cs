@@ -143,27 +143,59 @@ namespace Shopping_List
         {
             Suggestions.Clear();
 
-            var allArchivedProducts = Archives
-                .SelectMany(a => a.Products)
+            var productGroups = Archives
+                .SelectMany(a => a.Products.Select(p => new { p.Name, a.Date }))
                 .GroupBy(p => p.Name)
-                .ToDictionary(g => g.Key, g => g.Count());
+                .ToList();
 
-            foreach (var entry in allArchivedProducts)
+            foreach (var group in productGroups)
             {
-                string productName = entry.Key;
-                int timesBought = entry.Value;
+                string name = group.Key;
+                var date = group.Select(g => g.Date).OrderBy(d => d).ToList();
+                int count = date.Count;
 
-                bool alreadyInCurrent = CurrentProducts.Any(p => p.Name == productName);
+                bool inCurrent = CurrentProducts.Any(p => p.Name == name);
+                if (inCurrent)
+                    continue;
 
-                // Показывать подсказки только для популярных продуктов, которых сейчас нет
-                if (timesBought >= 2 && !alreadyInCurrent)
+                // 1. Часто покупаемые (минимум 3 раза)
+                if (count >= 2)
                 {
                     Suggestions.Add(new Suggestion
                     {
-                        ProductName = productName,
-                        Message = $"Вы часто покупали {productName}. Добавить?"
+                        ProductName = name,
+                        Message = $"Вы часто покупали {name}. Добавить?"
                     });
                 }
+
+                // 2. Регулярно с интервалом (например, каждые 3–5 дней)
+                if (count >= 2)
+                {
+                    var intervals = date.Zip(date.Skip(1), (a, b) => (b - a).TotalDays).ToList();
+                    double avgInterval = intervals.Average();
+
+                    if (avgInterval >= 3 && avgInterval <= 5)
+                    {
+                        Suggestions.Add(new Suggestion
+                        {
+                            ProductName = name,
+                            Message = $"Вы покупаете {name} примерно каждые {Math.Round(avgInterval)} дня. Добавить?"
+                        });
+                    }
+                }
+
+                // 3. Был только один раз — возможно, понравилось?
+                //if (count == 1)
+                //{
+                //    Suggestions.Add(new Suggestion
+                //    {
+                //        ProductName = name,
+                //        Message = $"Вы однажды пробовали {name}. Хотите повторить?"
+                //    });
+                //}
+
+                //4. Самый популярный товар
+
             }
         }
         private void AddSuggestion(string productName)
