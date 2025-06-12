@@ -207,6 +207,15 @@ namespace Shopping_List
                 //}
 
                 //4. продукт был в архиве, но не появляется уже более 30 дней
+                if((DateTime.Now - date[0]).TotalDays >= 30)
+                {
+                    Suggestions.Add(new Suggestion
+                    {
+                        ProductName = name,
+                        Message = $"Вы давно не покупали {name} — добавить?"
+                    });
+                }
+                
             }
             //5. Самый популярный товар
             var mostFrequentProduct = frequentProducts[0];
