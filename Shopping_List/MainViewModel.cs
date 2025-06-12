@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.IO;
 using System.Text.Json;
+using System.Windows;
 
 namespace Shopping_List
 {
@@ -147,6 +148,17 @@ namespace Shopping_List
                 .SelectMany(a => a.Products.Select(p => new { p.Name, a.Date }))
                 .GroupBy(p => p.Name)
                 .ToList();
+            //самые популярные
+            var frequentProducts = Archives
+                .SelectMany(a => a.Products)
+                .GroupBy(p => p.Name)
+                .Select(g => new
+                {
+                    Name = g.Key,
+                    Count = g.Count()
+                })
+                .OrderByDescending(p => p.Count)
+                .ToList();
 
             foreach (var group in productGroups)
             {
@@ -194,8 +206,17 @@ namespace Shopping_List
                 //    });
                 //}
 
-                //4. Самый популярный товар
-
+                //4. продукт был в архиве, но не появляется уже более 30 дней
+            }
+            //5. Самый популярный товар
+            var mostFrequentProduct = frequentProducts[0];
+            if (mostFrequentProduct != null)
+            {
+                Suggestions.Add(new Suggestion
+                {
+                    ProductName = mostFrequentProduct.Name,
+                    Message = $"Ваш любимый продукт - {mostFrequentProduct.Name}. Добавить снова?"
+                });
             }
         }
         private void AddSuggestion(string productName)
