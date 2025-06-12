@@ -38,6 +38,7 @@ namespace Shopping_List
         public ICommand DeleteProductCommand { get; }
         public ICommand CompleteListCommand { get; }
         public ICommand AddSuggestionCommand { get; }
+        public ICommand RepeatListCommand { get; }
 
 
         public MainViewModel()
@@ -50,6 +51,7 @@ namespace Shopping_List
             DeleteProductCommand = new RelayCommand<Product>(DeleteProduct);
             CompleteListCommand = new RelayCommand(CompleteList, CanCompleteList);
             AddSuggestionCommand = new RelayCommand<string>(AddSuggestion);
+            RepeatListCommand = new RelayCommand<ShoppingListArchive>(RepeatList);
 
             // работа с файлом
             var data = StorageService.Load();
@@ -159,6 +161,22 @@ namespace Shopping_List
 
                 UpdateSuggestions(); // обновим подсказки после добавления
             }
+        }
+        private void RepeatList(ShoppingListArchive archive)
+        {
+            if (archive == null || archive.Products == null) return;
+
+            foreach (var product in archive.Products)
+            {
+                CurrentProducts.Add(new Product
+                {
+                    Name = product.Name,
+                    IsChecked = false,
+                    DateAdded = DateTime.Now
+                });
+            }
+
+            UpdateSuggestions();
         }
     }
 }
