@@ -215,7 +215,6 @@ namespace Shopping_List
                         Message = $"Вы давно не покупали {name} — добавить?"
                     });
                 }
-                
             }
             //5. Самый популярный товар
             var mostFrequentProduct = frequentProducts[0];
@@ -226,6 +225,12 @@ namespace Shopping_List
                     ProductName = mostFrequentProduct.Name,
                     Message = $"Ваш любимый продукт - {mostFrequentProduct.Name}. Добавить снова?"
                 });
+            }
+
+            //обрезать список Suggestions до первых трёх элементов после всех добавлений
+            while (Suggestions.Count > 3)
+            {
+                Suggestions.RemoveAt(Suggestions.Count - 1);
             }
         }
         private void AddSuggestion(string productName)
