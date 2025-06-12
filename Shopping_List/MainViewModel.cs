@@ -200,7 +200,7 @@ namespace Shopping_List
         //подсказки при вводе
         private void UpdateProductSuggestions()
         {
-            if (NewProductName == null)
+            if (string.IsNullOrWhiteSpace(NewProductName))
             {
                 SuggestedProducts.Clear();
                 return;
